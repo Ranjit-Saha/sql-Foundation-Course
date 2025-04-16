@@ -1,10 +1,10 @@
---
+---
 # 🚀 RayVaan's SQL Learning Documentary
 
 > **Engineer by Mind, Explorer by Heart**  
 > _A complete beginner-to-analyst level SQL walkthrough, featuring real-world queries and hands-on insights._
 
---
+---
 
 ## 📅 Day-1: Text-Based Retrieval Queries
 
