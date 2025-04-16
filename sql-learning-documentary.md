@@ -144,7 +144,7 @@ SELECT *, (revenue - budget) AS profit FROM financials;
 ### 💰 Currency & Unit Conversion:
 ```sql
 -- Convert to INR if USD
-SELECT *, IF(currency = 'USD', revenue * 77, revenue) AS revenue_inr FROM financials;
+SELECT *, IF(currency = 'USD', revenue * 85, revenue) AS revenue_inr FROM financials;
 
 -- Normalize unit to millions
 SELECT *,
