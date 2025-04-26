@@ -166,7 +166,7 @@ FROM financials;
 
 ---
 
-## 🎓 Coffee break 
+##🍵☕☕ Coffee break 
 
 - Every SQL query has a purpose — think like an analyst.
 - Focus on clean data retrieval *and* real-world business logic.
