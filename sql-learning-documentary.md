@@ -173,7 +173,286 @@ FROM financials;
 - Practice with sample datasets to build intuition.
 
 ---
+## 📚 SQL Joins Mastery: The Art of Combining Tables
 
+---
+
+### 🌟 Why Multiple Tables?
+
+- 🔹 To **save space** and avoid repetition.
+- 🔹 To **organize data** cleanly and efficiently.
+- 🔹 To **simplify updates** and improve database maintenance.
+
+In SQL, we connect multiple tables using the **JOIN** clause.
+
+---
+
+### 🔗 Understanding SQL Joins
+
+- **INNER JOIN**: Intersection — only common records.
+- **LEFT JOIN**: All left table records + matching right records.
+- **RIGHT JOIN**: All right table records + matching left records.
+- **FULL JOIN**: Everything from both tables (LEFT + RIGHT via UNION).
+
+---
+
+### 1⃣ INNER JOIN (Default JOIN)
+
+```sql
+-- View tables individually
+SELECT * FROM movies;
+SELECT * FROM financials;
+
+-- INNER JOIN
+SELECT m.movie_id, title, budget, revenue, currency, unit
+FROM movies m
+JOIN financials f
+ON m.movie_id = f.movie_id;
+```
+
+---
+
+### 2⃣ LEFT JOIN
+
+```sql
+SELECT m.movie_id, title, budget, revenue, currency, unit
+FROM movies m
+LEFT JOIN financials f
+ON m.movie_id = f.movie_id;
+```
+*Shows all movies even without matching financials.*
+
+---
+
+### 3⃣ RIGHT JOIN
+
+```sql
+SELECT m.movie_id, title, budget, revenue, currency, unit
+FROM movies m
+RIGHT JOIN financials f
+ON m.movie_id = f.movie_id;
+```
+*Shows all financials even without matching movies.*
+
+---
+
+### 4⃣ FULL JOIN (Using UNION)
+
+```sql
+SELECT m.movie_id, title, budget, revenue, currency, unit
+FROM movies m
+LEFT JOIN financials f ON m.movie_id = f.movie_id
+
+UNION
+
+SELECT f.movie_id, title, budget, revenue, currency, unit
+FROM movies m
+RIGHT JOIN financials f ON m.movie_id = f.movie_id;
+```
+*Combines everything from both tables.*
+
+---
+
+### 🛠️ USING() Clause
+
+```sql
+SELECT movie_id, title, budget, revenue, currency, unit
+FROM movies m
+LEFT JOIN financials f
+USING (movie_id);
+```
+*Simplifies JOINs when column names are the same.*
+
+---
+
+### 📌 SQL Joins: Key Takeaways
+
+- JOIN + ON = Merge tables on condition.
+- JOIN + ON + AND = Merge on multiple columns.
+- Aliases (m, f) make queries shorter.
+- INNER is default JOIN.
+- LEFT, RIGHT, FULL = OUTER JOIN types.
+- FULL JOIN = LEFT JOIN + RIGHT JOIN using UNION.
+
+---
+
+### ✏️ Exercises: SQL Joins in Action
+
+**🔹 Show all Movies with their Language Names**
+
+```sql
+SELECT title, name
+FROM movies m
+INNER JOIN languages l
+ON m.language_id = l.language_id;
+```
+
+**🔹 Show All Telugu Movies**
+
+```sql
+SELECT title
+FROM movies m
+LEFT JOIN languages l
+ON m.language_id = l.language_id
+WHERE l.name = "Telugu";
+```
+
+**🔹 Show Language and Number of Movies Released**
+
+```sql
+SELECT l.name, COUNT(m.movie_id) AS no_movies
+FROM languages l
+LEFT JOIN movies m USING (language_id)
+GROUP BY language_id
+ORDER BY no_movies DESC;
+```
+
+---
+
+### 📊 CROSS JOIN: Cartesian Product
+
+```sql
+SELECT * FROM items CROSS JOIN variants;
+
+SELECT *,
+    CONCAT(name, " - ", variant_name) AS full_name,
+    (price + variant_price) AS full_price
+FROM items
+CROSS JOIN variants;
+```
+
+**Takeaways:**
+
+- **CONCAT()** = Combine strings.
+- CROSS JOIN = When no common columns exist.
+
+---
+
+### 📊 Analytics Within Tables: Calculating Profit
+
+**💰 Profit Calculation**
+
+```sql
+SELECT m.movie_id, title, budget, revenue, currency, unit,
+       (revenue - budget) AS profit
+FROM movies m
+JOIN financials f
+ON m.movie_id = f.movie_id;
+```
+
+**💰 Bollywood Movies Only**
+
+```sql
+SELECT m.movie_id, title, budget, revenue, currency, unit,
+       (revenue - budget) AS profit
+FROM movies m
+JOIN financials f
+ON m.movie_id = f.movie_id
+WHERE industry = "Bollywood"
+ORDER BY profit DESC;
+```
+
+**💰 Adjusted Profit in Million Units**
+
+```sql
+SELECT m.movie_id, title, budget, revenue, currency, unit,
+       CASE
+           WHEN unit = "thousands" THEN ROUND((revenue - budget) / 1000, 2)
+           WHEN unit = "billions" THEN ROUND((revenue - budget) * 1000, 2)
+           ELSE ROUND((revenue - budget), 2)
+       END AS profit_mln
+FROM movies m
+JOIN financials f
+ON m.movie_id = f.movie_id
+WHERE industry = "Bollywood"
+ORDER BY profit_mln DESC;
+```
+
+**Key Lessons:**
+
+- Analyze tables to find business insights.
+- ORDER BY to find Top/Bottom performers.
+- Master JOINs for powerful analytics!
+
+---
+
+### 💪 Joining More Than Two Tables
+
+**🎬 Movies and Actors**
+
+```sql
+SELECT m.title, a.name
+FROM movies m
+JOIN movie_actor ma ON m.movie_id = ma.movie_id
+JOIN actors a ON a.actor_id = ma.actor_id;
+```
+
+**🎬 Movies and All Actors (Grouped)**
+
+```sql
+SELECT m.title, GROUP_CONCAT(a.name) AS actors
+FROM movies m
+JOIN movie_actor ma ON m.movie_id = ma.movie_id
+JOIN actors a ON a.actor_id = ma.actor_id
+GROUP BY m.movie_id;
+```
+
+**👤 Actors and Their Movies**
+
+```sql
+SELECT a.name, GROUP_CONCAT(m.title SEPARATOR " | ") AS movies
+FROM actors a
+JOIN movie_actor ma ON a.actor_id = ma.actor_id
+JOIN movies m ON m.movie_id = ma.movie_id
+GROUP BY a.actor_id;
+```
+
+**👤 Actors with Movies Count**
+
+```sql
+SELECT a.name, GROUP_CONCAT(m.title SEPARATOR " | ") AS movies,
+       COUNT(m.title) AS movies_count
+FROM actors a
+JOIN movie_actor ma ON a.actor_id = ma.actor_id
+JOIN movies m ON m.movie_id = ma.movie_id
+GROUP BY a.actor_id
+ORDER BY movies_count DESC;
+```
+
+**Tips:**
+
+- Break down complex joins into smaller steps.
+- Use **GROUP_CONCAT()** to combine rows into a single text field.
+- ER diagrams make JOIN planning easier.
+
+---
+
+### ✏️ Final Exercise: Hindi Movies Revenue Report
+
+```sql
+SELECT title, revenue, currency, unit,
+       CASE
+           WHEN unit = "thousands" THEN ROUND(revenue / 1000, 2)
+           WHEN unit = "billions" THEN ROUND(revenue * 1000, 2)
+           ELSE revenue
+       END AS revenue_mln
+FROM movies m
+JOIN financials f ON m.movie_id = f.movie_id
+JOIN languages l ON m.language_id = l.language_id
+WHERE l.name = "Hindi"
+ORDER BY revenue_mln DESC;
+```
+
+---
+
+### 🚀 Final Note:
+
+**Mastering Joins = Mastering SQL Analytics!**
+
+Unlock the real power of databases by becoming fluent in joining tables and crafting insights like a true Data Wizard 🧙‍♂️🌟.
+
+
+---
 ## 🧾 Credits & Signature
 
 > Made with 💡 by **RayVaan**  
